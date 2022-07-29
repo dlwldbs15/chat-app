@@ -1,0 +1,214 @@
+body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+  .container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+  }
+  .left {
+      width: 460px;
+      border-right :rgba(0, 0, 0, .4) solid 2px;
+      background-color: rgb(250, 250, 250);
+  }
+  #btn-new-group {
+    width: 200px;
+    height: 50px;
+    margin: 10px 0px;
+  }
+  .left-top {
+      display: block;
+      margin: 0 auto;
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+  }
+  .left-bottom {
+      display: block;
+      width: 100%;
+      height: calc(100% - 70px);
+      overflow-y: auto;
+  }
+  .right {
+      width: calc(100% - 460px);
+      height: 100%;
+      box-sizing: border-box;
+      float: right;
+      background-color: aliceblue;
+  }
+  .talk-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+  .div-render-chat {
+    margin: 10px 0px;
+  }
+  .div-talk-list {
+    display : block;
+    width: 100%;
+    height: calc(100% - 60px);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+  }
+  .div-div-talk-left {
+    display : inline-flex;
+    width: 100%;
+    margin: 0;
+    padding: 0px;
+    align-items: flex-end;
+  }
+  .div-div-talk-right {
+    display : inline-flex;
+    justify-content: right;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    align-items: flex-end;
+  }
+  .div-talk-left {
+    display : flex;
+    justify-content: flex-end;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+  }
+  .nickname{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color:rgb(95, 95, 95)
+  }
+  .time-left{
+    display : flex;
+    height: auto;
+    margin-left : 5px;
+    margin-top: 5px;
+    margin-bottom: 0px;
+  }
+  .div-talk-right {
+    display : flex;
+    justify-content: flex-end;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+  }
+  .time-right{
+    display : flex;
+    justify-content: flex-end;
+    height: auto;
+    margin-right : 5px;
+    margin-top: 5px;
+    margin-bottom: 0px;
+  }
+  .div-talk-default {
+    display: table;
+    width: 100%;
+    height: 100%;
+    text-align: center; 
+  }
+  .p-default {
+    vertical-align: middle;
+    display: table-cell;  
+    background-color: rgb(245, 245, 245);
+  }
+  .div-talk-input-form {
+    display: block;
+    width: 100%;
+    height: 60px;
+  }
+  .div-talk-input-form .text-field-message {
+    width: calc(100% - 75px);
+    background-color: white;
+    margin-left: 5px;
+  }
+  .div-talk-input-form .btn-send {
+    display: inline-block;
+    width: 60px;
+    height: 56px;
+    margin: 0px 2.5px;
+  }
+
+  .talk-bubble {
+    position: relative;
+    background: #fcfcfc;
+    border-radius: .4em;
+    margin-left:15px;
+    margin-top: 0px;
+    max-width: 50%;
+    height: min-content;
+    width: max-content;
+    overflow-wrap: break-word;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 10px;
+    box-shadow: 1.5px 1.5px rgba(0, 0, 0, .3)
+  }
+  
+  .talk-bubble:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-right-color: #fcfcfc;
+    border-left: 0;
+    border-top: 0;
+    margin-top: -10.5px;
+    margin-left: -10px;
+  }
+  .talk-bubble-right {
+    position: relative;
+    background: #ffd95e;
+    border-radius: .4em;
+    margin-right:20px;
+    margin-top: 10px;
+    max-width: 50%;
+    height: min-content;
+    width: max-content;
+    overflow-wrap: normal;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 10px;
+    box-shadow: 1.5px 1.5px rgba(0, 0, 0, .3)
+  }
+  
+  .talk-bubble-right:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-left-color: #ffd95e;
+    border-right: 0;
+    border-top: 0;
+    margin-top: -10.5px;
+    margin-right: -10px;
+  }
+
+  .span-date {
+    display: inline-block;
+    font-size: 13px;
+    background-color: #a5a5a588;
+    border-radius: 10px;
+    border-width: 0;
+    width: 80%;
+  }
+  
+  .div-date {
+    display: block;
+    text-align: center;
+    padding: 0px;
+  }

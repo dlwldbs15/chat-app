@@ -1,0 +1,136 @@
+<!--Login 화면 스타일-->
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+*, ::after, ::before {
+    box-sizing: inherit;
+}
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Poppins-Regular,sans-serif;
+}
+.div-login-container { 
+  width: 100%;
+  min-height: 100vh;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background: #f2f2f2;
+}
+.div-wrap-login {
+  width: 390px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 77px 55px 33px;
+  box-shadow: 0 5px 10px 0 rgb(0 0 0 / 10%);
+  -moz-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
+  -webkit-box-shadow: 0 5px 10px 0 rgb(0 0 0 / 10%);
+}
+.div-login-container-form-btn {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 13px;
+}
+.div-wrap-login-validate-input {
+    width: 100%;
+    position: relative;
+    border-bottom: 2px solid #adadad;
+    margin-bottom: 37px;
+}
+
+.div-form-login {
+    width: 100%;
+}
+
+input {
+    outline: none;
+    border: none;
+}
+.input-normal {
+  font-family: Poppins-Regular;
+  font-size: 15px;
+  color: #555;
+  line-height: 1.2;
+  display: block;
+  width: 80%;
+  height: 45px;
+  background: 0 0;
+  padding: 0 5px;
+}
+.focus-input-nickname {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+.focus-input-nickname:before {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    -webkit-transition: all .4s;
+    -o-transition: all .4s;
+    -moz-transition: all .4s;
+    transition: all .4s;
+    background: #6a7dfe;
+    background: -webkit-linear-gradient(to left,#d8dfe0,#8921ff);
+    background: -o-linear-gradient(to left,#d8dfe0,#8921ff);
+    background: -moz-linear-gradient(to left,#d8dfe0,#8921ff);
+    background: linear-gradient(to left,#d8dfe0,#8921ff);
+}
+.focus-input-nickname:after {
+    font-family: Poppins-Regular;
+    font-size: 15px;
+    color: #999;
+    line-height: 1.2;
+    content: attr(data-placeholder);
+    display: block;
+    width: 100%;
+    position: absolute;
+    top: 16px;
+    left: 0;
+    padding-left: 5px;
+    -webkit-transition: all .4s;
+    -o-transition: all .4s;
+    -moz-transition: all .4s;
+    transition: all .4s;
+}
+
+.login-form-title {
+    display: block;
+    font-family: Poppins-Bold;
+    font-size: 30px;
+    color: #333;
+    line-height: 1.2;
+    text-align: center;
+}
+.p-b-26 {
+    padding-bottom: 26px;
+}
+
+#btn-login {
+  width: 300px;
+  height: 50px;
+}
