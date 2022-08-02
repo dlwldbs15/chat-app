@@ -1,35 +1,46 @@
-import * as React from 'react';
+import React, {useState} from 'react';
+import { useDispatch, useSelector } from "react-redux";
+import { openGroup, selectRoom, initList } from "../redux/action";
+
 import {ListSubheader, List, ListItemButton, ListItemIcon, ListItemText, Collapse} from '@mui/material';
 import {ExpandLess, ExpandMore } from '@mui/icons-material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
-export default function NestedList({header, group_data, room_data, add_room_handler, select_room_handler, delete_room_handler}) {
-  const [openStates, setOpen] = React.useState([]);
-  const [selectedStates, setSelectedStates] = React.useState([]);
-  const [group, setGroup] = React.useState([]);
+export default function GroupList({header, add_room_handler, select_room_handler, delete_room_handler}) {
+  const dispatch = useDispatch();
+  const state = useSelector((state) => state.chatReducer);
+  const openStates = state.ListState.groupOpenStates;
+  const selectedStates = state.ListState.roomSelectedStates;
+  const groupStates = state.ListState.groupStates;
+  const unreadStates = state.ListState.unreadMesssageStates;
+  const groupData = state.Data.groupData;
+  const roomData = state.Data.roomData;
 
   //초기 그룹/방목록 가져오기
   React.useEffect(() => {
     var initGroups = [];
     var initOpenStates = [];
     var initSelectedStates = [];
-    group_data.some(function(element){
-      let rooms = room_data.filter(room => room.groupId === element._id).map(room => {return([room._id, room.title])});
+    var initUnreadStates = [];
+    groupData.some(function(element){
+      let rooms = roomData.filter(room => room.groupId === element._id).map(room => {return([room._id, room.title])});
       let group = [element.title, element._id, rooms]
       initGroups = [...initGroups, group];
-      initOpenStates = [...initOpenStates, { id : element._id, open : false }];
-      return (room_data.length === 0)
+      let openIndex = openStates.findIndex(open => open.id === element._id);
+      let openValue = openIndex > -1 ? openStates[openIndex].open : false;
+      initOpenStates = [...initOpenStates, { id : element._id, open : openValue }];
+      return (roomData.length === 0)
     });
 
-    room_data.forEach(function(room){
-      initSelectedStates = [...initSelectedStates, { id : room._id, selected : false}];
+    roomData.forEach(function(room){
+      let selectedIndex = selectedStates.findIndex(open => open.id === room._id);
+      let selectedValue = selectedIndex > -1 ? openStates[selectedIndex].open : false;
+      initSelectedStates = [...initSelectedStates, { id : room._id, selected : selectedValue}];
+      initUnreadStates = [...initUnreadStates, { id : room._id, messageCount : 0}];
     });
-
-    setSelectedStates(initSelectedStates);
-    setGroup(initGroups);
-    setOpen(initOpenStates);
-  },[group_data, room_data]);
+    dispatch(initList({ group : initGroups, open : initOpenStates, selected : initSelectedStates, unread : initUnreadStates}));
+  },[groupData, roomData]);
 
   const handleClick = (e, key) => {
     const index = openStates.findIndex(open => open.id === key);
@@ -37,7 +48,7 @@ export default function NestedList({header, group_data, room_data, add_room_hand
     if(index !== -1) {
       copyStates[index] = {...copyStates[index], open: !openStates[index].open};
     }
-    setOpen(copyStates);
+    dispatch(openGroup(copyStates));
   };
 
   const addRoomClick = (e, group_id) => {
@@ -55,7 +66,7 @@ export default function NestedList({header, group_data, room_data, add_room_hand
       copyStates[prevIndex] = {...copyStates[prevIndex], selected : !selectedStates[prevIndex].selected};
     if(curIndex !== -1)
       copyStates[curIndex] = {...copyStates[curIndex], selected : !selectedStates[curIndex].selected};
-    setSelectedStates(copyStates);
+    dispatch(selectRoom(copyStates));
   }
 
   const deleteRoomClick = (e, room_id) => {
@@ -72,7 +83,7 @@ export default function NestedList({header, group_data, room_data, add_room_hand
       </ListItemButton>
     ));
   }
-  const groupList = group.map((item, index) => (
+  const groupList = groupStates.map((item, index) => (
     <div>
       <ListItemButton key={item[1]} onClick={(e) => handleClick(e, item[1])}>
       <ListItemIcon onClick={(e) => addRoomClick(e, item[1])}>

@@ -1,22 +1,30 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { login } from "../redux/action";
+
 import Button from '../components/button'
+import AlertDialog from '../components/alertDialog'
 import '../css/styles.css';
 import '../css/login-styles.css';
 
-import { login } from '../client'
+import { createUser } from '../client'
 
 function CustomSpan({text}) {
     return <span className="focus-input-nickname" data-placeholder={text}/>
 }
 
 function Login(props) {
-    console.log('rendered : Login')
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    console.log('rendered : LoginPage')
     const [nickname, setTextValue] = useState('');
     const [focused, setFocusValue] = useState(false);
     const [placeholder, setHolderValue] = useState('Nickname');
-    const navigate = useNavigate();
+    const [alertOpen, setAlertOpen] = useState(false);
+    
     useEffect(()=>{
         if (focused === true || nickname !== '') {
             if (placeholder !== '')
@@ -36,13 +44,20 @@ function Login(props) {
             setFocusValue(value);
     }
     
-    const loginButtonClick = () => {
-        let success = login(nickname);
-        if (success)
+    const clickLoginButton = () => {
+        if (nickname === '')
         {
-            console.log('login success ', nickname);
-            navigate(`/main`, {replace : false, state : { user : nickname}});
-            props.HandleLocation(`/main`);
+            setAlertOpen(true);
+        }
+        else {
+            let success = createUser(nickname);
+            if (success)
+            {
+                dispatch(login(nickname));
+                console.log('login success ', nickname);
+                navigate(`/main`, {replace : false, state : { user : nickname}});
+                props.HandleLocation(`/main`);
+            }
         }
     }
 
@@ -50,6 +65,7 @@ function Login(props) {
         <div className='div-login-container'>
             <div className='div-wrap-login'>
                 <div className='div-form-login'>
+                    <AlertDialog title={'ID Error'} Discription={'입력된 ID가 없습니다.'} isOpen={alertOpen} visibleOKButton={true}/>
                     <span className="login-form-title p-b-26">Welcome</span>
                     <div className='div-wrap-login-validate-input'>
                         <input className="input-normal" type="text" name='nickname' 
@@ -57,7 +73,7 @@ function Login(props) {
                         <CustomSpan text={placeholder}/>
                     </div>
                     <div className='div-login-container-form-btn'>
-                     <Button type="button btn-2" id="btn-login" text="Login" onClick={loginButtonClick} width={150} height={50} />
+                     <Button type="button btn-2" id="btn-login" text="Login" onClick={clickLoginButton} width={150} height={50} />
                     </div>
                 </div>
             </div>

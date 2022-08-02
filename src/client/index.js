@@ -25,7 +25,15 @@ export async function fetchChats(room_id){
     } catch (err) { console.log(err); }
 }
 
-export async function login(nickname) {
+export async function fetchInfo(user_id) {
+    try {
+        var res = await axios.get(`${base_url}/api/connectInfo/${user_id}`);
+        console.log('Fetch Info :', res.data);    
+        return res.data;
+    } catch (err) { console.log(err); }
+}
+
+export async function createUser(nickname) {
     let success = false;
         try {
             await axios.get(`${base_url}/api/user`)
@@ -122,4 +130,47 @@ export async function deleteRoom(room_id) {
         console.log(e);
     }
 }
+
+export async function createConnectInfo(room_id, user_id) {
+    try {
+        let data = {
+            'roomId' : room_id,
+            'userId' : user_id,
+        }
+        var res = await axios.post(`${base_url}/api/connectInfo`, JSON.stringify(data),{
+            headers: { "Content-Type": `application/json`},
+          });
+          console.log('ConnectInfo 생성 :', res.data);
+          return res.data;
+    } catch (e) { 
+        console.log(e);
+    }
+}
+
+export async function deleteConnectInfo(room_id, user_id) {
+    try {
+        var res = await axios.delete(`${base_url}/api/connectInfo?userId=${user_id}&roomId=${room_id}`);
+          console.log('ConnectInfo 삭제 :', res.data);
+          return res.data;
+    } catch (e) { 
+        console.log(e);
+    }
+}
+
+export async function updateConnectInfo(room_id, user_id, connecting) {
+    try {
+        let data = {
+            'leaveTime' : new Date(),
+            'connecting' : connecting
+        }
+        var res = await axios.put(`${base_url}/api/connectInfo?userId=${user_id}&roomId=${room_id}`, JSON.stringify(data),{
+            headers: { "Content-Type": `application/json`},
+          });
+          console.log('ConnectInfo 업데이트 :', res.data);
+          return res.data;
+    } catch (e) { 
+        console.log(e);
+    }
+}
+
 

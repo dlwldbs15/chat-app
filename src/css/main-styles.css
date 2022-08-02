@@ -20,6 +20,11 @@ body {
     height: 50px;
     margin: 10px 0px;
   }
+  #btn-logout {
+    width: 50px;
+    float: right;
+    margin: 15px 0px;
+  }
   .left-top {
       display: block;
       margin: 0 auto;
@@ -211,4 +216,5 @@ body {
     display: block;
     text-align: center;
     padding: 0px;
+    margin: 0px 5px;
   }

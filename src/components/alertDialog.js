@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
-export default function AlertDialog({Title, Discription, isOpen, okCallback}) {
+export default function AlertDialog({Title, Discription, isOpen, visibleOKButton, visibleCancelButton, okCallback}) {
   const [open, setOpen] = React.useState(false);
   React.useEffect(() => {
     setOpen(isOpen);
@@ -8,7 +8,8 @@ export default function AlertDialog({Title, Discription, isOpen, okCallback}) {
 
   const handleOK = () => {
     setOpen(false);
-    okCallback();
+    if (okCallback != null)
+      okCallback();
   };
   const handleClose = () => {
     setOpen(false);
@@ -31,10 +32,10 @@ export default function AlertDialog({Title, Discription, isOpen, okCallback}) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleOK} autoFocus>
+          {visibleCancelButton ? <Button onClick={handleClose}>Cancel</Button> : null}
+          {visibleOKButton ? <Button onClick={handleOK} autoFocus>
             OK
-          </Button>
+          </Button> : null}
         </DialogActions>
       </Dialog>
     </div>

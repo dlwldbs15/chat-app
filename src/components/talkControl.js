@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useSelector } from "react-redux";
+//import { openGroup, selectRoom, initList } from "../redux/action";
 import {socket, initSocketConnection} from '../client/socketio';
 import { TextField, Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -6,15 +8,16 @@ import '../css/main-styles.css';
 import '../client';
 import { createChat, fetchChats } from '../client';
 
-export default function TalkControl({roomId, currnetUser}) {
-    const [state, setState] = useState({name: currnetUser, message: ''});
+export default function TalkControl({roomId}) {
+    const user = useSelector((state) => state.userReducer.user);
+    const [state, setState] = useState({name: user, message: ''});
     const [chat, setChat] = useState([]);
     const talkListRef = useRef();
 
     useEffect(()=>{
       initSocketConnection();
       if (roomId !== null && roomId !== undefined) {
-        socket.emit('joinRoom', roomId, currnetUser);
+        socket.emit('joinRoom', roomId, user);
         var date = new Date();
         var time = date.getTime();
         fetchChats(roomId).then((res) => {
@@ -22,17 +25,17 @@ export default function TalkControl({roomId, currnetUser}) {
               var d = new Date(chat.createAt);
               return d.getTime() < time;
             }).map(chat => {
-            return({name : chat.userName, message : chat.message, datetime :chat.createAt})
+            return({id : chat._id, name : chat.userName, message : chat.message, datetime :chat.createAt})
             });
           setChat(result);
         }
         );
       }
-    },[roomId, currnetUser]);
+    },[roomId, user]);
 
     useEffect(()=>{
-      socket.on('message', (name, message, datetime)=>{
-        setChat((chat) => chat.concat({name, message, datetime}));
+      socket.on('message', (id, name, message, datetime)=>{
+        setChat((chat) => chat.concat({id, name, message, datetime}));
       })
     },[]);
     useEffect(() => {
@@ -47,7 +50,7 @@ export default function TalkControl({roomId, currnetUser}) {
       const {name, message} = state;
       createChat(roomId, name, message).then((res) => 
       {
-        socket.emit('message', roomId, name, message, res.createAt);
+        socket.emit('message', roomId, res._id, name, message, res.createAt);
         setState({name, message : ''});
       });
     }
@@ -81,7 +84,7 @@ export default function TalkControl({roomId, currnetUser}) {
 
     const renderChat = () => {
       var prevTime = null;
-      var chatElement = chat.map(({name, message, datetime}, index) => {
+      var chatElement = chat.map(({id, name, message, datetime}, index) => {
         var insertDate = false;
         if (prevTime === null) {
           prevTime = datetime;
@@ -93,16 +96,16 @@ export default function TalkControl({roomId, currnetUser}) {
         return(
           <div className='div-render-chat'>
           {insertDate === true ? (<div className='div-date'>{dateDisplay(datetime)}</div>) : null}
-          {name === state.name ? (
+          {name === user ? (
             <div className='div-talk-right'>
-              <div className='div-div-talk-right' key={index}>
+              <div className='div-div-talk-right' key={id}>
                 <h6 className='time-right'>{dateToTimeString(datetime)}</h6>
                 <div className='talk-bubble-right'>{message}</div>
               </div>
             </div>
           ) : (
             <div className='div-talk-left'>
-              <div className='div-div-talk-left' key={index}>
+              <div className='div-div-talk-left' key={id}>
                 <div className='div-talk-box'>
                   <h5 className='nickname'>{name}:</h5>
                 </div>

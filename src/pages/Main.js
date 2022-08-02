@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { fetchGroups, fetchRooms, createGroup, createRoom, deleteRoom } from '../client';
 import { socket, initSocketConnection } from '../client/socketio';
+import { logout, setGroup, setRoom } from "../redux/action";
 
 import '../css/styles.css';
 import '../css/main-styles.css';
@@ -10,12 +12,16 @@ import GroupList from '../components/groupList';
 import CustomButton from '../components/button';
 import AlertDialog from '../components/alertDialog';
 import TalkControl from '../components/talkControl';
+import LogoutIcon from '@mui/icons-material/Logout';
+import IconButton from '@mui/material/IconButton';
 
 function Main (){
-  var location = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.userReducer.user);
+  const groupData = useSelector((state) => state.chatReducer.Data.groupData);
+  const roomData = useSelector((state) => state.chatReducer.Data.roomData);
   //#region States
-  const [groups, setGroup] = useState([]);
-  const [rooms, setRoom] = useState([]);
   const [isLoaded, setLoaded] = useState(false);
   const [AddGroupOpen, setOpenGroupDialog] = useState(false);
   const [AddRoomOpen, setOpenRoomDialog] = useState(false);
@@ -23,17 +29,14 @@ function Main (){
   const [selectedGroupId, setGroupId] = useState();
   const [selectedRoomId, setRoomId] = useState();
   const [deleteRoomId, setDeleteRoomId] = useState();
-  const [user, setUser] = useState(location.state.user);
   //#endregion
   
   //#region 초기 값 가져오기
   const updateInitState = () => {
     fetchGroups().then((groupData) => {
-      console.log('group data in', groupData);
-      setGroup(groupData);
+      dispatch(setGroup(groupData));
       fetchRooms().then((roomData) => {
-        console.log('room data in', roomData);
-        setRoom(roomData);
+        dispatch(setRoom(roomData));
         setLoaded(roomData !== undefined)
         if (roomData !== undefined) {
           initSocketConnection();
@@ -66,25 +69,29 @@ function Main (){
     setDeleteRoomId(room_id);
   }
   const newGroup = (name) => {
-    createGroup(name).then((groupData) => {
-      console.log('newGroup :', groupData);
-      setGroup([...groups, groupData]);
+    createGroup(name).then((group) => {
+      console.log('newGroup :', group);
+      dispatch(setGroup([...groupData, group]));
     });
   }
   const newRoom = (name) => {
-    createRoom(selectedGroupId, name).then((roomData)=> {
-      console.log('newRoom :', roomData);
-      setRoom([...rooms, roomData]);
+    createRoom(selectedGroupId, name).then((room)=> {
+      console.log('newRoom :', room);
+      dispatch(setRoom([...roomData, room]));
     })
   }
   const deleteSelectedRoom = () => {
     deleteRoom(deleteRoomId).then((resData) => {
-      let copyRooms = [...rooms];
+      let copyRooms = [...roomData];
       var index = copyRooms.findIndex(r => r._id === deleteRoomId);
       copyRooms.splice(index, 1);
       setRoom(copyRooms);
       console.log('deleteRoom :', resData);
     });
+  }
+  const clickLogout = () => {
+    dispatch(logout());
+    navigate(`/`, {replace : false, state : { user : ''}});
   }
   //#endregion
   return (
@@ -92,19 +99,22 @@ function Main (){
       <div className="left">
           <div className="left-top">
             <CustomButton type="button btn-2" id="btn-new-group" text={'Add Group'} onClick={clickAddGroup} width={200}/>
+            <IconButton id="btn-logout" onClick={clickLogout}>
+              <LogoutIcon color="secondary" aria-label="Logout"/>
+            </IconButton>
             <FormDialog title={'그룹 추가'} content={'추가할 그룹 명을 입력하세요.'} placeholder={'Group Name'} isOpen={AddGroupOpen} submitValue={newGroup}/>
             <FormDialog title={'방 추가'} content={'추가할 방 명을 입력하세요.'} placeholder={'Room Name'} isOpen={AddRoomOpen} submitValue={newRoom}/>
-            <AlertDialog title={'방 추가'} Discription={'선택한 방을 삭제하시겠습니까?'} isOpen={DeleteRoomOpen} okCallback={deleteSelectedRoom}/>
+            <AlertDialog title={'방 추가'} Discription={'선택한 방을 삭제하시겠습니까?'} isOpen={DeleteRoomOpen} visibleCancelButton={true} visibleOKButton={true} okCallback={deleteSelectedRoom}/>
           </div>
           <div className="left-bottom">
             {
-              isLoaded ? (<GroupList header={'공고리스트'} group_data={groups} room_data={rooms} add_room_handler={clickAddRoom} select_room_handler={clickSelectRoom} delete_room_handler={clickDeleteRoom}/>) :
+              isLoaded ? (<GroupList header={'공고리스트'} add_room_handler={clickAddRoom} select_room_handler={clickSelectRoom} delete_room_handler={clickDeleteRoom}/>) :
               null
             }
           </div>
       </div>
       <div className="right">
-          <TalkControl roomId={selectedRoomId} currnetUser={user}/>
+          <TalkControl roomId={selectedRoomId}/>
       </div>
     </div>
   );
