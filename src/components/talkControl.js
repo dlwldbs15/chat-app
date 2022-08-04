@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from "react-redux";
-//import { openGroup, selectRoom, initList } from "../redux/action";
 import {socket, initSocketConnection} from '../client/socketio';
 import { TextField, Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -8,16 +7,16 @@ import '../css/main-styles.css';
 import '../client';
 import { createChat, fetchChats } from '../client';
 
-export default function TalkControl({roomId}) {
-    const user = useSelector((state) => state.userReducer.user);
-    const [state, setState] = useState({name: user, message: ''});
+export default function TalkControl({roomId, updateBadge}) {
+    const userInfo = useSelector((state) => state.userReducer.User);
+    const [state, setState] = useState({name: userInfo.nickname, message: ''});
     const [chat, setChat] = useState([]);
     const talkListRef = useRef();
 
     useEffect(()=>{
       initSocketConnection();
       if (roomId !== null && roomId !== undefined) {
-        socket.emit('joinRoom', roomId, user);
+        socket.emit('joinRoom', roomId, userInfo.nickname);
         var date = new Date();
         var time = date.getTime();
         fetchChats(roomId).then((res) => {
@@ -28,15 +27,16 @@ export default function TalkControl({roomId}) {
             return({id : chat._id, name : chat.userName, message : chat.message, datetime :chat.createAt})
             });
           setChat(result);
+          updateBadge(roomId, true);
         }
         );
       }
-    },[roomId, user]);
+    },[roomId, userInfo]);
 
     useEffect(()=>{
       socket.on('message', (id, name, message, datetime)=>{
         setChat((chat) => chat.concat({id, name, message, datetime}));
-      })
+      });
     },[]);
     useEffect(() => {
       if (talkListRef.current) {
@@ -96,7 +96,7 @@ export default function TalkControl({roomId}) {
         return(
           <div className='div-render-chat'>
           {insertDate === true ? (<div className='div-date'>{dateDisplay(datetime)}</div>) : null}
-          {name === user ? (
+          {name === userInfo.nickname ? (
             <div className='div-talk-right'>
               <div className='div-div-talk-right' key={id}>
                 <h6 className='time-right'>{dateToTimeString(datetime)}</h6>

@@ -1,47 +1,39 @@
 import React, {useState} from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { openGroup, selectRoom, initList } from "../redux/action";
+import { openGroup, selectRoom } from "../redux/action";
 
-import {ListSubheader, List, ListItemButton, ListItemIcon, ListItemText, Collapse} from '@mui/material';
+import {ListSubheader, List, ListItemButton, ListItemIcon, ListItemText, Collapse, Badge} from '@mui/material';
 import {ExpandLess, ExpandMore } from '@mui/icons-material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import MailIcon from '@mui/icons-material/Mail';
+
+function MessageBadge ({messageCount, roomId}) {
+  var unreadState = messageCount.filter(state => state.id === roomId)[0];
+  console.log('badge : room['+roomId+']' , unreadState.messageCount);
+  return(
+    <Badge color="secondary" badgeContent={unreadState.messageCount} max={99}>
+      <MailIcon />
+    </Badge>
+  );
+}
 
 export default function GroupList({header, add_room_handler, select_room_handler, delete_room_handler}) {
   const dispatch = useDispatch();
-  const state = useSelector((state) => state.chatReducer);
-  const openStates = state.ListState.groupOpenStates;
-  const selectedStates = state.ListState.roomSelectedStates;
-  const groupStates = state.ListState.groupStates;
-  const unreadStates = state.ListState.unreadMesssageStates;
-  const groupData = state.Data.groupData;
-  const roomData = state.Data.roomData;
+  const openStates = useSelector((state) => state.chatReducer.ListState.groupOpenStates);
+  const selectedStates = useSelector((state) => state.chatReducer.ListState.roomSelectedStates);
+  const groupStates = useSelector((state) => state.chatReducer.ListState.groupStates);
+  const unreadStates = useSelector((state) => state.chatReducer.ListState.unreadMesssageStates);
 
+  const [messageCount, setMessageCount] = useState(unreadStates);
   //초기 그룹/방목록 가져오기
   React.useEffect(() => {
-    var initGroups = [];
-    var initOpenStates = [];
-    var initSelectedStates = [];
-    var initUnreadStates = [];
-    groupData.some(function(element){
-      let rooms = roomData.filter(room => room.groupId === element._id).map(room => {return([room._id, room.title])});
-      let group = [element.title, element._id, rooms]
-      initGroups = [...initGroups, group];
-      let openIndex = openStates.findIndex(open => open.id === element._id);
-      let openValue = openIndex > -1 ? openStates[openIndex].open : false;
-      initOpenStates = [...initOpenStates, { id : element._id, open : openValue }];
-      return (roomData.length === 0)
-    });
 
-    roomData.forEach(function(room){
-      let selectedIndex = selectedStates.findIndex(open => open.id === room._id);
-      let selectedValue = selectedIndex > -1 ? openStates[selectedIndex].open : false;
-      initSelectedStates = [...initSelectedStates, { id : room._id, selected : selectedValue}];
-      initUnreadStates = [...initUnreadStates, { id : room._id, messageCount : 0}];
-    });
-    dispatch(initList({ group : initGroups, open : initOpenStates, selected : initSelectedStates, unread : initUnreadStates}));
-  },[groupData, roomData]);
+  },[groupStates]);
 
+  React.useEffect(()=>{
+    setMessageCount(unreadStates);
+  },[unreadStates]);
   const handleClick = (e, key) => {
     const index = openStates.findIndex(open => open.id === key);
     let copyStates = [...openStates];
@@ -60,7 +52,8 @@ export default function GroupList({header, add_room_handler, select_room_handler
     select_room_handler(room_id);
     const prevIndex = selectedStates.findIndex(room => room.selected === true);
     const curIndex = selectedStates.findIndex(room => room.id === room_id);
-
+    if (prevIndex === curIndex)
+      return;
     let copyStates = [...selectedStates];
     if(prevIndex !== -1)
       copyStates[prevIndex] = {...copyStates[prevIndex], selected : !selectedStates[prevIndex].selected};
@@ -73,6 +66,7 @@ export default function GroupList({header, add_room_handler, select_room_handler
     e.stopPropagation();
     delete_room_handler(room_id);
   }
+
   const roomList = (rooms) => {
     return rooms.map((item) => (
       <ListItemButton key={item[0]} onClick={(e) => selectRoomClick(e, item[0])} sx={{ pl: 4}} selected={selectedStates[selectedStates.findIndex(room => room.id === item[0])].selected}>
@@ -80,6 +74,7 @@ export default function GroupList({header, add_room_handler, select_room_handler
         <RemoveCircleIcon/>
       </ListItemIcon>
       <ListItemText primary={item[1]} />
+        <MessageBadge messageCount={messageCount} roomId={item[0]}/>
       </ListItemButton>
     ));
   }

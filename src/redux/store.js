@@ -10,4 +10,5 @@ const enhancer =
     : composeWithDevTools(applyMiddleware(logger));
         
 const store = createStore(rootReducer, enhancer);
+
 export default store;

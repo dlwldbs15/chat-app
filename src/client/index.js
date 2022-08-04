@@ -33,44 +33,26 @@ export async function fetchInfo(user_id) {
     } catch (err) { console.log(err); }
 }
 
+export async function fetchUsers() {
+    try {
+        var res = await axios.get(`${base_url}/api/user`);
+        console.log('Fetch User :', res.data);
+        return res.data;
+    } catch (e) { console.log(e); }
+}
 export async function createUser(nickname) {
-    let success = false;
-        try {
-            await axios.get(`${base_url}/api/user`)
-            .then((res)=>{
-                //모든 유저 가져와서 닉네임 비교
-                var find = false;
-                if (res.data) {
-                    res.data.forEach(element => {
-                        if (element.nickname === nickname) find = true;                    
-                    });
-                } 
-                if (!find)
-                //없을 경우 전송 시도
-                    try {
-                        let data = {
-                            'nickname' : nickname
-                        }
-                        axios.post(`${base_url}/api/user`, JSON.stringify(data),{
-                          headers: { "Content-Type": `application/json`},
-                        }).then((res) => {
-                          console.log('User 생성 :', res.data);
-                          success = true;
-                        })
-                        .catch((error) => {
-                          console.error(error);
-                        });
-                    } catch (e) { 
-                        console.log(e);
-                    }
-                else {
-                    success = true;
-                }
-            });
-        } catch (err) {
-            console.log(err);
-        };
-    return success
+    try {
+        let data = {
+            'nickname' : nickname
+        }
+        var res = await axios.post(`${base_url}/api/user`, JSON.stringify(data),{
+          headers: { "Content-Type": `application/json`},
+        });
+        console.log('User 생성 :', res.data);
+        return res.data;
+    } catch (e) { 
+        console.log(e);
+    }
 }
 
 export async function createGroup (group_name) {
@@ -131,11 +113,12 @@ export async function deleteRoom(room_id) {
     }
 }
 
-export async function createConnectInfo(room_id, user_id) {
+export async function createConnectInfo(room_id, user_id, connecting) {
     try {
         let data = {
             'roomId' : room_id,
             'userId' : user_id,
+            'connecting' : connecting
         }
         var res = await axios.post(`${base_url}/api/connectInfo`, JSON.stringify(data),{
             headers: { "Content-Type": `application/json`},

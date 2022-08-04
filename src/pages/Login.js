@@ -9,7 +9,7 @@ import AlertDialog from '../components/alertDialog'
 import '../css/styles.css';
 import '../css/login-styles.css';
 
-import { createUser } from '../client'
+import { createUser, fetchUsers } from '../client'
 
 function CustomSpan({text}) {
     return <span className="focus-input-nickname" data-placeholder={text}/>
@@ -44,20 +44,38 @@ function Login(props) {
             setFocusValue(value);
     }
     
+    const loginPostwork = (userId) => {
+        var user = {id : userId, nickname : nickname};
+        dispatch(login(user));
+        console.log('login success ', nickname);
+        navigate(`/main`, {replace : false, state : { user : nickname}});
+        props.HandleLocation(`/main`);
+    }
+
     const clickLoginButton = () => {
         if (nickname === '')
         {
             setAlertOpen(true);
         }
         else {
-            let success = createUser(nickname);
-            if (success)
-            {
-                dispatch(login(nickname));
-                console.log('login success ', nickname);
-                navigate(`/main`, {replace : false, state : { user : nickname}});
-                props.HandleLocation(`/main`);
-            }
+             fetchUsers().then((users) => {
+                var userId = null;
+                if (users) {
+                    users.some(function(element){
+                        if(element.nickname === nickname)
+                        {
+                            userId = element._id;
+                            return true;
+                        }
+                        else
+                          return false;
+                      })
+                } 
+                if (userId === null)
+                    createUser(nickname).then((res) => {loginPostwork(res._id)});
+                else
+                    loginPostwork(userId);
+            });
         }
     }
 

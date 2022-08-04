@@ -2,7 +2,10 @@ export const LOGIN = "USER/LOGIN";
 export const LOGOUT = "USER/LOGOUT";
 
 const initialState = {
-    user : '',
+  User : {
+    id : '',
+    nickname : '',
+  }
 };
 
 const userChecker = (state = initialState, action) => {
@@ -10,12 +13,19 @@ const userChecker = (state = initialState, action) => {
       case LOGIN:
         return {
           ...state,
-          user: action.payload
+          User : {
+            ...state.User,
+            id : action.payload.id,
+            nickname : action.payload.nickname,
+          }
         };
       case LOGOUT:
         return {
             ...state,
-            user: ''
+            User : {
+              id: '',
+              nickname: '',  
+            }
         };
       default:
         return state;
